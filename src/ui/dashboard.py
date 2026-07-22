@@ -1,81 +1,51 @@
-#!/usr/bin/env python3
 """
-Metrics Dashboard
-Web-based metrics dashboard (lightweight).
-No stubs. No TODOs.
+Web dashboard for SEC-GUY metrics (using Flask or simple HTTP server).
 """
 
-import json
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from pathlib import Path
+import json
+import threading
+import time
 from typing import Dict
 
+class MetricsCollector:
+    _instance = None
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.data = {
+                "jobs_total": 0,
+                "jobs_success": 0,
+                "jobs_failed": 0,
+                "candidates_generated": 0,
+                "uptime_seconds": 0,
+                "active_jobs": 0,
+            }
+            cls._instance.start_time = time.time()
+        return cls._instance
 
-class DashboardHandler(BaseHTTPRequestHandler):
-    """Simple HTTP handler for metrics dashboard."""
+    def update(self, key: str, value: int = 1):
+        if key in self.data:
+            self.data[key] += value
 
+    def get(self) -> Dict:
+        self.data["uptime_seconds"] = int(time.time() - self.start_time)
+        return self.data
+
+
+class MetricsHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        if self.path == "/":
-            self._serve_dashboard()
-        elif self.path == "/api/metrics":
-            self._serve_metrics()
+        if self.path == "/api/metrics":
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            metrics = MetricsCollector().get()
+            self.wfile.write(json.dumps(metrics).encode())
         else:
-            self.send_error(404)
+            self.send_response(404)
+            self.end_headers()
 
-    def _serve_dashboard(self):
-        html = """
-        <!DOCTYPE html>
-        <html>
-        <head><title>Sec Guy Dashboard</title></head>
-        <body>
-        <h1>SEC-GUY v3.1 Dashboard</h1>
-        <div id="metrics"></div>
-        <script>
-        async function refresh() {
-            const resp = await fetch('/api/metrics');
-            const data = await resp.json();
-            document.getElementById('metrics').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-        }
-        refresh();
-        setInterval(refresh, 5000);
-        </script>
-        </body>
-        </html>
-        """
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html")
-        self.end_headers()
-        self.wfile.write(html.encode())
-
-    def _serve_metrics(self):
-        metrics = {
-            "version": "3.1.0",
-            "status": "running",
-            "active_jobs": 0,
-            "vault_entries": 0,
-            "brain_patterns": 0,
-        }
-        self.send_response(200)
-        self.send_header("Content-Type", "application/json")
-        self.end_headers()
-        self.wfile.write(json.dumps(metrics).encode())
-
-    def log_message(self, format, *args):
-        pass  # Suppress logs
-
-
-class DashboardServer:
-    """Lightweight dashboard server."""
-
-    def __init__(self, port: int = 8081):
-        self.port = port
-        self.server = HTTPServer(("127.0.0.1", port), DashboardHandler)
-
-    def start(self):
-        print(f"[DASHBOARD] Server started on http://127.0.0.1:{self.port}")
-        self.server.serve_forever()
-
-
-if __name__ == "__main__":
-    server = DashboardServer()
-    server.start()
+def start_dashboard(port: int = 8081):
+    server = HTTPServer(('', port), MetricsHandler)
+    print(f"Dashboard running on http://localhost:{port}")
+    server.serve_forever()

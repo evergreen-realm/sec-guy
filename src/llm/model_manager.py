@@ -131,7 +131,7 @@ class ModelManager:
             )
 
         # Last resort: cloud APIs
-        from src.llm.exo_client import CloudAIClient
+        from ..recovery.online_enrichment.cloud_ai_client import CloudAIClient
         cloud = CloudAIClient()
         return cloud.chat_with_fallback(messages, temperature=temperature, max_tokens=max_tokens)
 

@@ -33,6 +33,7 @@ SEC-GUY unifies multiple specialized recovery engines into an extensible orchest
 git clone https://github.com/your-username/sec-guy.git
 cd sec-guy
 pip install -e .
+secguy --help
 ```
 
 ---

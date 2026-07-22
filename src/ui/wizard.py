@@ -1,76 +1,63 @@
-#!/usr/bin/env python3
 """
-Setup Wizard
-Interactive terminal wizard for first-time configuration.
-No stubs. No TODOs.
+Setup wizard – interactive configuration of SEC-GUY.
 """
 
 from pathlib import Path
-from typing import Dict
+import yaml
+import logging
+from rich.console import Console
+from rich.prompt import Prompt, Confirm
+from rich.panel import Panel
+from ..core.platform import Platform
+
+logger = logging.getLogger(__name__)
+console = Console()
 
 
 class SetupWizard:
-    """Interactive setup wizard for Sec Guy."""
+    def __init__(self, config_path: Path = None):
+        self.config_path = config_path or Platform.get_config_dir() / "secguy.yaml"
+        self.config_path.parent.mkdir(parents=True, exist_ok=True)
 
-    def __init__(self):
-        self.config: Dict = {}
+    def run(self) -> None:
+        console.print(Panel("SEC-GUY Setup Wizard", style="bold blue"))
+        console.print("This will create a configuration file for your data recovery framework.\n")
 
-    def run(self) -> Dict:
-        """Run the full setup wizard."""
-        print("=" * 60)
-        print("SEC-GUY v3.1 Setup Wizard")
-        print("=" * 60)
-        print()
+        config = {}
 
-        self._configure_hardware()
-        self._configure_llm()
-        self._configure_security()
-        self._configure_enrichment()
-        self._configure_monitoring()
+        # Hashcat
+        config["hashcat_bin"] = Prompt.ask("Path to hashcat binary", default="hashcat")
+        config["hashcat_timeout"] = int(Prompt.ask("Hashcat timeout (seconds)", default="86400"))
 
-        self._save_config()
+        # BTCRecover
+        btcr_path = Prompt.ask("Path to BTCRecover directory", default="tools/btcrecover")
+        config["btcrecover_path"] = str(Path(btcr_path).resolve())
 
-        print()
-        print("Setup complete! Configuration saved to config/secguy.yaml.")
-        return self.config
-
-    def _save_config(self, path: Path = Path("config/secguy.yaml")) -> None:
-        """Write current configuration dictionary to secguy.yaml."""
-        import yaml
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with open(path, "w") as f:
-            yaml.dump(self.config, f, default_flow_style=False)
-
-    def _configure_hardware(self) -> None:
-        print("--- Hardware Configuration ---")
-        machine = input("Machine type [t490/production]: ").strip().lower() or "t490"
-        self.config["hardware"] = {"primary_machine": machine}
-
-    def _configure_llm(self) -> None:
-        print("--- LLM Configuration ---")
-        exo = input("Enable EXO cluster? [Y/n]: ").strip().lower() != "n"
-        self.config["llm"] = {"exo_cluster": exo}
-
-    def _configure_security(self) -> None:
-        print("--- Security Configuration ---")
-        bio = input("Require biometric authentication? [Y/n]: ").strip().lower() != "n"
-        delay = input("Time delay (e.g., 5m, 1h): ").strip() or "5m"
-        self.config["security"] = {
-            "biometric_required": bio,
-            "time_delay_default": delay,
+        # LLM settings
+        config["llm"] = {
+            "local_enabled": Confirm.ask("Enable local LLM (LM Studio)?", default=True),
+            "cloud_enabled": Confirm.ask("Enable cloud LLM providers?", default=True),
+            "default_cloud": Prompt.ask("Default cloud provider", default="groq"),
+            "lmstudio_url": Prompt.ask("LM Studio API URL", default="http://localhost:1234/v1"),
+            "exo_enabled": Confirm.ask("Enable EXO distributed inference?", default=False),
         }
 
-    def _configure_enrichment(self) -> None:
-        print("--- Online Enrichment ---")
-        enabled = input("Enable online enrichment? [Y/n]: ").strip().lower() != "n"
-        self.config["online_enrichment"] = {"enabled": enabled}
+        # API keys
+        config["api_keys"] = {}
+        if Confirm.ask("Enter Groq API key?", default=False):
+            config["api_keys"]["GROQ_API_KEY"] = Prompt.ask("Groq API key", password=True)
+        if Confirm.ask("Enter Cerebras API key?", default=False):
+            config["api_keys"]["CEREBRAS_API_KEY"] = Prompt.ask("Cerebras API key", password=True)
 
-    def _configure_monitoring(self) -> None:
-        print("--- Monitoring ---")
-        prom = input("Enable Prometheus metrics? [Y/n]: ").strip().lower() != "n"
-        self.config["monitoring"] = {"prometheus_enabled": prom}
+        # Neo4j
+        config["neo4j"] = {
+            "uri": Prompt.ask("Neo4j URI", default="bolt://localhost:7687"),
+            "user": Prompt.ask("Neo4j user", default="neo4j"),
+            "password": Prompt.ask("Neo4j password", password=True, default="secguy_neo4j_2025"),
+        }
 
+        # Write config
+        with open(self.config_path, 'w') as f:
+            yaml.dump(config, f, default_flow_style=False)
 
-if __name__ == "__main__":
-    wizard = SetupWizard()
-    config = wizard.run()
+        console.print(f"[green]Configuration saved to {self.config_path}[/]")

@@ -6,6 +6,7 @@ No stubs. No TODOs.
 """
 
 import hashlib
+from pathlib import Path
 from typing import List, Optional, Tuple
 
 
