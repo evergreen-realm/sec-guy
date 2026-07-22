@@ -7,7 +7,7 @@ No stubs. No TODOs.
 
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 
 class BTCRecoverWrapper:
@@ -31,7 +31,7 @@ class BTCRecoverWrapper:
             "--dsw",
         ]
 
-        print(f"[BTCRECOVER] Starting tokenlist attack...")
+        print("[BTCRECOVER] Starting tokenlist attack...")
         print(f"[BTCRECOVER] Tokenlist: {tokenlist}")
 
         try:

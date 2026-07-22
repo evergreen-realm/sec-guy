@@ -7,7 +7,7 @@ No stubs. No TODOs.
 
 import hashlib
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Dict, List
 
 import requests
 

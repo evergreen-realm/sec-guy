@@ -3,22 +3,16 @@ Terminal UI for SEC-GUY using Rich and Textual.
 Provides interactive dashboard for recovery operations.
 """
 
-import asyncio
-from typing import Optional
-from pathlib import Path
 
 from rich.console import Console
 from rich.panel import Panel
 from rich.layout import Layout
-from rich.prompt import Prompt, Confirm
+from rich.prompt import Prompt
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeRemainingColumn
 from rich.table import Table
-from rich.text import Text
-from rich.live import Live
 from rich import box
 
 import time
-import threading
 
 console = Console()
 

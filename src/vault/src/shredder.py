@@ -7,7 +7,6 @@ No stubs. No TODOs.
 
 import os
 from pathlib import Path
-from typing import Optional
 
 
 class Shredder:

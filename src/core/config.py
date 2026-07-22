@@ -5,11 +5,11 @@ Loads, validates, and provides access to secguy.yaml.
 No stubs. No TODOs.
 """
 
-import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import yaml
+from src.core.platform import Platform
 
 
 class ConfigManager:
@@ -18,7 +18,7 @@ class ConfigManager:
     def __init__(self, config_path: Optional[Path] = None):
         if config_path is None:
             local_cfg = Path("config/secguy.yaml")
-            opt_cfg = Path("/opt/sec-guy/config/secguy.yaml")
+            opt_cfg = Platform.get_config_dir() / "config/secguy.yaml"
             self.config_path = local_cfg if local_cfg.exists() else opt_cfg
         else:
             self.config_path = config_path
@@ -74,7 +74,7 @@ class ConfigManager:
 
     @property
     def vault_mount(self) -> str:
-        return self.get("secguy", "vault", "mount_point", default="/dev/shm/secguy-vault")
+        return self.get("secguy", "vault", "mount_point", default=str(Platform.get_vault_dir()))
 
     @property
     def api_keys(self) -> Dict[str, str]:

@@ -6,11 +6,9 @@ Generates candidates based on human psychology, temporal trends, and crypto cult
 No stubs. No TODOs. Real implementation.
 """
 
-import itertools
-import random
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Generator, List, Optional, Set
+from typing import Dict, Generator, List
 
 
 class BehavioralProfiler:

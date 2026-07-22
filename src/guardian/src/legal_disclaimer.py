@@ -7,7 +7,6 @@ No stubs. No TODOs.
 
 import time
 from pathlib import Path
-from typing import Dict
 
 
 class LegalDisclaimer:

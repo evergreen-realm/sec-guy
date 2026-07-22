@@ -2,9 +2,7 @@
 Verify that a seed phrase derives the expected blockchain addresses.
 """
 
-from typing import List, Optional
-import hashlib
-import ecdsa
+from typing import List
 from mnemonic import Mnemonic
 import logging
 

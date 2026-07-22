@@ -111,18 +111,18 @@ def main():
     result = orchestrator.execute_recovery(job)
 
     if result.get("success"):
-        print(f"\n[SEC-GUY] ✓ RECOVERY SUCCESSFUL")
+        print("\n[SEC-GUY] ✓ RECOVERY SUCCESSFUL")
         if "password" in result:
-            print(f"[SEC-GUY] Password recovered and stored in vault")
+            print("[SEC-GUY] Password recovered and stored in vault")
             print(f"[SEC-GUY] Vault entry: {result.get('vault_entry_id', 'N/A')}")
         if "seed_phrase" in result:
-            print(f"[SEC-GUY] Seed phrase recovered and stored in vault")
+            print("[SEC-GUY] Seed phrase recovered and stored in vault")
             print(f"[SEC-GUY] Vault entry: {result.get('vault_entry_id', 'N/A')}")
         print(f"[SEC-GUY] Time: {result.get('time_seconds', 0):.1f}s")
     else:
-        print(f"\n[SEC-GUY] ✗ RECOVERY FAILED")
+        print("\n[SEC-GUY] ✗ RECOVERY FAILED")
         print(f"[SEC-GUY] Error: {result.get('error', 'Unknown error')}")
-        print(f"[SEC-GUY] All recovery vectors exhausted.")
+        print("[SEC-GUY] All recovery vectors exhausted.")
 
     return 0 if result.get("success") else 1
 

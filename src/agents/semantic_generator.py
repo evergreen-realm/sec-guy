@@ -6,9 +6,8 @@ into comprehensive password candidate lists.
 No stubs. No TODOs. Real implementation.
 """
 
-import json
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from src.llm.exo_client import EXOClient
 from src.llm.lmstudio_client import LMStudioClient

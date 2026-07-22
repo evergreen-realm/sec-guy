@@ -7,13 +7,10 @@ No stubs. No TODOs.
 
 import os
 import secrets
-import struct
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import argon2
 
 

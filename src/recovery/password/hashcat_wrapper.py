@@ -6,14 +6,11 @@ FIXED: Proper hash format conversion from exodus2hashcat.py output.
 No stubs. No TODOs. Real implementation.
 """
 
-import json
-import os
-import re
 import subprocess
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional
 
 
 @dataclass
@@ -137,7 +134,7 @@ class HashcatExodusWrapper:
         if gpu_info["available"]:
             cmd.extend(["-d", ",".join(str(i) for i in range(len(gpu_info["devices"])))])
 
-        print(f"[HASHCAT] Starting tokenlist attack...")
+        print("[HASHCAT] Starting tokenlist attack...")
         print(f"[HASHCAT] Hash file: {hash_file}")
         print(f"[HASHCAT] Tokenlist: {tokenlist}")
         print(f"[HASHCAT] Output: {output_file}")

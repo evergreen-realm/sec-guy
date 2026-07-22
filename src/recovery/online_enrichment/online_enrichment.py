@@ -8,7 +8,7 @@ No stubs. No TODOs. Real implementation.
 
 import json
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from src.recovery.online_enrichment.hibp_client import HIBPClient
 from src.recovery.online_enrichment.dehashed_client import DeHashedClient

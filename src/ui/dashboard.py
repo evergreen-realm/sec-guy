@@ -4,7 +4,6 @@ Web dashboard for SEC-GUY metrics (using Flask or simple HTTP server).
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
-import threading
 import time
 from typing import Dict
 

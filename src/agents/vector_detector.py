@@ -7,7 +7,7 @@ No stubs. No TODOs. Real implementation.
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from src.recovery.corruption.exodus_parser import ExodusVersionDetector
 

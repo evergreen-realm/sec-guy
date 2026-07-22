@@ -4,9 +4,7 @@ Exodus wallet version and parameter detection.
 
 from pathlib import Path
 from typing import Dict, Any, Optional, Tuple
-import struct
 import logging
-import json
 
 logger = logging.getLogger(__name__)
 

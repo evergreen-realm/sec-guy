@@ -9,8 +9,7 @@ import getpass
 import hashlib
 import subprocess
 import time
-from pathlib import Path
-from typing import Dict, Optional
+from typing import Optional
 
 
 class BiometricGate:
@@ -86,7 +85,7 @@ class BiometricGate:
                 print("[BIOMETRIC] ✓ Fingerprint verified")
                 return True
             else:
-                print(f"[BIOMETRIC] ✗ Fingerprint verification failed")
+                print("[BIOMETRIC] ✗ Fingerprint verification failed")
                 return False
         except Exception as e:
             print(f"[BIOMETRIC] fprintd error: {e}")

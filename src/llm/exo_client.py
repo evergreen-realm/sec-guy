@@ -6,12 +6,9 @@ Handles model routing, speculative decoding, and failover.
 No stubs. No TODOs.
 """
 
-import json
 import subprocess
-import time
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Generator
+from typing import Dict, List, Any
 
 import requests
 

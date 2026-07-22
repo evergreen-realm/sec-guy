@@ -5,9 +5,7 @@ Connects to LM Studio running locally for fast model switching.
 No stubs. No TODOs.
 """
 
-import json
-import time
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 
 import requests
 

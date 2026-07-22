@@ -7,7 +7,7 @@ No stubs. No TODOs. Real implementation.
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from src.llm.exo_client import EXOClient
 from src.llm.lmstudio_client import LMStudioClient

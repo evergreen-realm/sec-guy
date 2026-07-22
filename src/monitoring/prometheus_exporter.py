@@ -5,7 +5,6 @@ Exports recovery metrics for Prometheus scraping.
 No stubs. No TODOs.
 """
 
-from typing import Dict, Optional
 
 try:
     from prometheus_client import Counter, Gauge, Histogram, start_http_server

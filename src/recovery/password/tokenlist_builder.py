@@ -5,10 +5,9 @@ Constructs semantic tokenlists from hints, CUPP, CeWL, and enrichment data.
 No stubs. No TODOs.
 """
 
-import itertools
 import re
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import List
 
 
 class TokenlistBuilder:

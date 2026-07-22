@@ -7,7 +7,7 @@ No stubs. No TODOs.
 
 import subprocess
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 
 
 class JohnWrapper:
@@ -28,7 +28,7 @@ class JohnWrapper:
             str(hash_file),
         ]
 
-        print(f"[JOHN] Starting wordlist attack (CPU)...")
+        print("[JOHN] Starting wordlist attack (CPU)...")
 
         try:
             result = subprocess.run(

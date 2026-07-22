@@ -7,7 +7,7 @@ No stubs. No TODOs.
 
 import hashlib
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 
 class BIP39Validator:

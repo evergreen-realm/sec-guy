@@ -8,16 +8,19 @@ No stubs. No TODOs. Real implementation.
 """
 
 import getpass
-import json
-import time
 import uuid
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import Dict, List, Optional, Any
+import logging
 
 from src.core.config import get_config
-from src.core.crypto_utils import SecureVault
+from src.recovery.corruption.json_repair import repair_json_file
+from src.recovery.twofa.backup_code_parser import BackupCodeParser
+from src.recovery.twofa.totp_generator import TOTPGenerator
+
+logger = logging.getLogger(__name__)
 
 
 class RecoveryVector(Enum):
@@ -72,10 +75,6 @@ class SecGuyOrchestrator:
         from src.recovery.zero_hint.temporal_reconstructor import TemporalReconstructor
         from src.recovery.zero_hint.cross_wallet_correlator import CrossWalletCorrelator
         from src.recovery.online_enrichment.online_enrichment import OnlineEnrichmentAgent
-        from src.recovery.corruption.json_repair import repair_json_file
-        from src.recovery.corruption.version_detector import ExodusVersionDetector as VersionDetector
-        from src.recovery.twofa.totp_generator import TOTPGenerator
-        from src.recovery.twofa.backup_code_parser import BackupCodeParser
         from src.agents.semantic_generator import SemanticGenerator
         from src.agents.vector_detector import VectorDetector
         from src.guardian.src.biometric_gate import BiometricGate

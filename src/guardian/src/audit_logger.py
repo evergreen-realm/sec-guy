@@ -11,13 +11,14 @@ import time
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Optional
+from src.core.platform import Platform
 
 
 class AuditLogger:
     """Tamper-evident audit logging for Sec Guy."""
 
-    def __init__(self, log_dir: Path = Path("/opt/sec-guy/logs")):
-        self.log_dir = log_dir
+    def __init__(self, log_dir: Optional[Path] = None):
+        self.log_dir = log_dir or Platform.get_log_dir()
         self.log_dir.mkdir(parents=True, exist_ok=True)
         self.log_file = self.log_dir / "audit.log"
         self.chain_hash = "0" * 64

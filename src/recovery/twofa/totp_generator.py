@@ -5,7 +5,6 @@ Generates TOTP codes from secrets for Exodus portfolio sync recovery.
 No stubs. No TODOs.
 """
 
-import base64
 import time
 from typing import Optional
 

@@ -12,8 +12,8 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Optional
-
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from src.core.platform import Platform
 import argon2
 
 
@@ -43,8 +43,10 @@ class TimeLockVault:
     ARGON2_MEMORY_COST = 65536
     ARGON2_PARALLELISM = 4
 
-    def __init__(self, mount_point: str = "/dev/shm/secguy-vault",
+    def __init__(self, mount_point: Optional[str] = None,
                  default_delay_seconds: int = 300):
+        if mount_point is None:
+            mount_point = str(Platform.get_vault_dir())
         self.mount_point = Path(mount_point)
         self.mount_point.mkdir(parents=True, exist_ok=True)
         self.default_delay = default_delay_seconds
