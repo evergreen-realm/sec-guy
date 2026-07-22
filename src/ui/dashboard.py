@@ -48,3 +48,7 @@ def start_dashboard(port: int = 8081):
     server = HTTPServer(('', port), MetricsHandler)
     print(f"Dashboard running on http://localhost:{port}")
     server.serve_forever()
+
+
+if __name__ == '__main__':
+    start_dashboard(8081)

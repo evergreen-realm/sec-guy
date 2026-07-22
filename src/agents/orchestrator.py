@@ -345,6 +345,8 @@ class SecGuyOrchestrator:
                 f.write(candidate + "\n")
 
         hash_line = self.hashcat.extract_hash(job.wallet_path)
+        if not hash_line:
+            return {"success": False, "error": "Failed to extract hash from wallet"}
         hash_file = Path(f"/tmp/{job.job_id}.hash")
         with open(hash_file, "w") as f:
             f.write(hash_line + "\n")
