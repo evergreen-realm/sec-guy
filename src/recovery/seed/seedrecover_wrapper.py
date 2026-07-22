@@ -33,11 +33,60 @@ class SeedRecoverWrapper:
         wallet_type: str = "exodus"
     ) -> Tuple[Optional[List[str]], Optional[str]]:
         """
-        Recover missing BIP39 seed words.
+        Recover missing BIP39 seed words via seedrecover.py.
         """
-        logger.info("SeedRecoverWrapper.recover_seed called (stub implementation)")
-        return None, "Stub implementation – seed recovery not yet integrated"
+        if not self.seedrecover_script.exists():
+            return None, f"seedrecover.py not found at {self.seedrecover_script}"
+
+        mnemonic_str = " ".join(partial_words)
+        cmd = [
+            "python3",
+            str(self.seedrecover_script),
+            "--mnemonic", mnemonic_str,
+            "--wallet-type", wallet_type,
+            "--dsw",
+        ]
+        if wallet_file and wallet_file.exists():
+            cmd.extend(["--wallet", str(wallet_file)])
+
+        for pos in missing_positions:
+            cmd.extend(["--missing-word", str(pos)])
+
+        logger.info("Executing seedrecover with command: %s", " ".join(cmd))
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=timeout_seconds,
+                cwd=str(self.btcrecover_path)
+            )
+
+            stdout = result.stdout
+            if "Seed found:" in stdout:
+                for line in stdout.splitlines():
+                    if "Seed found:" in line:
+                        seed_str = line.split("Seed found:")[1].strip()
+                        recovered_words = seed_str.split()
+                        return recovered_words, None
+            return None, "Seed phrase not found within specified search space"
+
+        except subprocess.TimeoutExpired:
+            return None, f"Execution timed out after {timeout_seconds} seconds"
+        except Exception as e:
+            logger.exception("Error executing seedrecover: %s", e)
+            return None, str(e)
 
     def verify_seed(self, seed_words: List[str], address: str) -> bool:
-        logger.debug("verify_seed called (stub)")
-        return False
+        """Verify seed words against a expected blockchain address."""
+        try:
+            from .bip39_validator import BIP39Validator
+            if not BIP39Validator.validate_mnemonic(seed_words):
+                return False
+            from .address_verifier import AddressVerifier
+            verifier = AddressVerifier()
+            verification = verifier.verify_seed(" ".join(seed_words), expected_address=address)
+            return verification.get("match", False)
+        except Exception as e:
+            logger.error("Failed to verify seed: %s", e)
+            return False

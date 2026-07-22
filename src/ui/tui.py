@@ -184,7 +184,22 @@ class SecGuyTUI:
         self.show_main_dashboard()
 
     def show_settings(self):
-        console.print("[cyan]Settings (stub)[/]")
+        console.clear()
+        console.print(Panel(
+            "[bold green]SEC-GUY System Configuration[/bold green]\n\n"
+            "[bold white]General Settings:[/bold white]\n"
+            "  • Version: [cyan]3.1.0[/cyan]\n"
+            "  • Vault TTL: [cyan]300 seconds[/cyan]\n"
+            "  • Max Concurrent Jobs: [cyan]5[/cyan]\n"
+            "  • Neo4j URI: [cyan]bolt://localhost:7687[/cyan]\n"
+            "  • Default Cloud LLM Provider: [cyan]Groq[/cyan]\n\n"
+            "[bold white]Tool Integration Paths:[/bold white]\n"
+            "  • Hashcat Binary: [cyan]hashcat[/cyan]\n"
+            "  • BTCRecover Path: [cyan]tools/btcrecover[/cyan]\n"
+            "  • John the Ripper: [cyan]john[/cyan]\n",
+            title="System Settings",
+            border_style="magenta"
+        ))
         Prompt.ask("Press Enter to return")
         self.show_main_dashboard()
 
