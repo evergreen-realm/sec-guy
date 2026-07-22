@@ -1,0 +1,8 @@
+.env
+*.seco
+*.vault
+logs/*.log
+logs/*.jsonl
+__pycache__/
+*.pyc
+.pytest_cache/

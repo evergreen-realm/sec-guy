@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+env/
+.venv
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Project-specific
+tmp/
+logs/
+enrichment_data/
+models/
+wordlists/
+tools/
+*.seco
+dummy.seco
+.vscode/
+.idea/
+*.log
+.DS_Store
