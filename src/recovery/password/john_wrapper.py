@@ -11,8 +11,14 @@ from typing import Dict
 logger = logging.getLogger(__name__)
 
 class JohnWrapper:
-    def __init__(self, john_bin: str = "john"):
-        self.john_bin = john_bin
+    def __init__(self, john_bin: str = None, tools_dir: Path = None):
+        if tools_dir is None:
+            tools_dir = Path(__file__).parent.parent.parent.parent / "sec-guy" / "tools"
+        if john_bin is None:
+            john_bin_path = tools_dir / "john-1.9.0-jumbo-1-win64" / "run" / "john.exe"
+            self.john_bin = str(john_bin_path) if john_bin_path.exists() else "john"
+        else:
+            self.john_bin = john_bin
 
     def run_attack(self, hash_file: Path, wordlist: Path, timeout_hours: int = 24) -> Dict:
         if not hash_file.exists():

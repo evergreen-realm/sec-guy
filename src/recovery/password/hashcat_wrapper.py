@@ -19,6 +19,17 @@ class HashcatExodusWrapper:
         self.work_dir = tools_dir / "tmp"
         self.work_dir.mkdir(parents=True, exist_ok=True)
 
+    def extract_hash(self, wallet_path: Path) -> Optional[str]:
+        """Public method for hash extraction."""
+        if wallet_path.exists():
+            try:
+                text = wallet_path.read_text().strip()
+                if text.startswith('$exodus$'):
+                    return text
+            except Exception:
+                pass
+        return self._extract_hash(wallet_path)
+
     def _extract_hash(self, wallet_path: Path) -> Optional[str]:
         """Extract Exodus hash using exodus2hashcat.py."""
         if not self.exodus2hashcat.exists():

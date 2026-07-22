@@ -39,13 +39,13 @@ class SemanticGenerator:
 
     def generate_from_hints(self, hints: str, creation_year: int,
                             provider: str = "auto",
-                            max_candidates: int = 10000) -> List[str]:
+                            max_candidates: int = 10000, **kwargs) -> List[str]:
         """
         Generate candidates from hints using LLM.
         Provider priority: auto -> LM Studio -> EXO -> Cloud
         """
         prompt = self.load_prompt("semantic").format(
-            hints=hints, creation_year=creation_year
+            hints=hints, creation_year=creation_year, structure_mask=kwargs.get("structure_mask", "")
         )
         messages = [{"role": "user", "content": prompt}]
 
