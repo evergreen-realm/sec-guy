@@ -7,6 +7,7 @@ No stubs. No TODOs.
 """
 
 import json
+import logging
 import time
 from dataclasses import dataclass
 from datetime import datetime
@@ -14,6 +15,8 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
 
 from neo4j import GraphDatabase
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -43,25 +46,28 @@ class Neo4jBrain:
 
     def _init_schema(self) -> None:
         """Initialize graph schema with constraints and indexes."""
-        with self.driver.session() as session:
-            # Constraints
-            session.run("""
-                CREATE CONSTRAINT pattern_id IF NOT EXISTS
-                FOR (p:Pattern) REQUIRE p.pattern_id IS UNIQUE
-            """)
-            session.run("""
-                CREATE CONSTRAINT wallet_id IF NOT EXISTS
-                FOR (w:Wallet) REQUIRE w.wallet_id IS UNIQUE
-            """)
-            # Indexes
-            session.run("""
-                CREATE INDEX pattern_type_idx IF NOT EXISTS
-                FOR (p:Pattern) ON (p.pattern_type)
-            """)
-            session.run("""
-                CREATE INDEX timeframe_idx IF NOT EXISTS
-                FOR (t:Timeframe) ON (t.year)
-            """)
+        try:
+            with self.driver.session() as session:
+                # Constraints
+                session.run("""
+                    CREATE CONSTRAINT pattern_id IF NOT EXISTS
+                    FOR (p:Pattern) REQUIRE p.pattern_id IS UNIQUE
+                """)
+                session.run("""
+                    CREATE CONSTRAINT wallet_id IF NOT EXISTS
+                    FOR (w:Wallet) REQUIRE w.wallet_id IS UNIQUE
+                """)
+                # Indexes
+                session.run("""
+                    CREATE INDEX pattern_type_idx IF NOT EXISTS
+                    FOR (p:Pattern) ON (p.pattern_type)
+                """)
+                session.run("""
+                    CREATE INDEX timeframe_idx IF NOT EXISTS
+                    FOR (t:Timeframe) ON (t.year)
+                """)
+        except Exception as e:
+            logger.warning("Neo4j database unavailable; graph learning features offline: %s", e)
 
     def close(self) -> None:
         self.driver.close()

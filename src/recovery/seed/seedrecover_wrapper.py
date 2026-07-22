@@ -18,9 +18,9 @@ class SeedRecoverWrapper:
     All operations are logged and require explicit user authorization.
     """
 
-    def __init__(self, btcrecover_path: Path):
-        self.btcrecover_path = btcrecover_path
-        self.seedrecover_script = btcrecover_path / "seedrecover.py"
+    def __init__(self, btcrecover_path: Optional[Path] = None):
+        self.btcrecover_path = btcrecover_path or Path("tools/btcrecover")
+        self.seedrecover_script = self.btcrecover_path / "seedrecover.py"
         if not self.seedrecover_script.exists():
             logger.warning("seedrecover.py not found at %s", self.seedrecover_script)
 

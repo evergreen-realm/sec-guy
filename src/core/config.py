@@ -15,8 +15,13 @@ import yaml
 class ConfigManager:
     """Centralized configuration management with hot-reload support."""
 
-    def __init__(self, config_path: Path = Path("/opt/sec-guy/config/secguy.yaml")):
-        self.config_path = config_path
+    def __init__(self, config_path: Optional[Path] = None):
+        if config_path is None:
+            local_cfg = Path("config/secguy.yaml")
+            opt_cfg = Path("/opt/sec-guy/config/secguy.yaml")
+            self.config_path = local_cfg if local_cfg.exists() else opt_cfg
+        else:
+            self.config_path = config_path
         self._config: Dict[str, Any] = {}
         self._mtime = 0.0
         self.reload()
@@ -24,11 +29,13 @@ class ConfigManager:
     def reload(self) -> None:
         """Reload configuration from disk if changed."""
         if not self.config_path.exists():
-            raise FileNotFoundError(f"Config not found: {self.config_path}")
+            # Return empty config if file doesn't exist
+            self._config = {}
+            return
         mtime = self.config_path.stat().st_mtime
         if mtime > self._mtime:
             with open(self.config_path) as f:
-                self._config = yaml.safe_load(f)
+                self._config = yaml.safe_load(f) or {}
             self._mtime = mtime
 
     def get(self, *keys: str, default: Any = None) -> Any:
