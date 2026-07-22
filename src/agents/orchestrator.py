@@ -145,9 +145,15 @@ class SecGuyOrchestrator:
             elif hint_length > 20: confidence += 15
             elif hint_length > 5: confidence += 5
 
-        gpu_info = self.hashcat.check_gpu_availability()
-        if gpu_info["available"]: confidence += 15
-        else: confidence += 3
+        try:
+            import subprocess
+            result = subprocess.run(["hashcat", "-I"], capture_output=True, timeout=5)
+            if result.returncode == 0:
+                confidence += 15
+            else:
+                confidence += 3
+        except Exception:
+            confidence += 3
 
         if self.enrichment.data_dir.exists():
             confidence += 10
@@ -260,11 +266,11 @@ class SecGuyOrchestrator:
         # Phase 4: Run hashcat
         output_file = Path(f"/tmp/{job.job_id}_cracked.txt")
         result = self.hashcat.run_tokenlist_attack(
-            hash_file, tokenlist_path, output_file,
+            job.wallet_path, tokenlist_path, output_file,
             timeout_hours=self.config.get("secguy", "recovery", "default_timeout_minutes", default=240) // 60
         )
 
-        if result["success"]:
+        if result.get("success"):
             vault_pw = self._get_vault_password()
             entry_id = self.vault.encrypt(
                 result["password"], vault_pw,
@@ -278,7 +284,7 @@ class SecGuyOrchestrator:
 
         # Phase 5: Fallback to btcrecover
         print("[ORCHESTRATOR] Hashcat failed. Trying btcrecover...")
-        btcr_result = self.btcrecover.run_tokenlist(job.wallet_path, tokenlist_path)
+        btcr_result = self.btcrecover.recover_password(job.wallet_path, hints=job.hints, tokenlist=tokenlist_path)
         if btcr_result.get("success"):
             vault_pw = self._get_vault_password()
             entry_id = self.vault.encrypt(btcr_result["password"], vault_pw,
@@ -287,7 +293,7 @@ class SecGuyOrchestrator:
 
         # Phase 6: Fallback to John
         print("[ORCHESTRATOR] Trying John the Ripper (CPU)...")
-        john_result = self.john.run_wordlist(hash_file, tokenlist_path)
+        john_result = self.john.run_attack(hash_file, tokenlist_path)
         if john_result.get("success"):
             vault_pw = self._get_vault_password()
             entry_id = self.vault.encrypt(john_result["password"], vault_pw,
@@ -335,9 +341,9 @@ class SecGuyOrchestrator:
             f.write(hash_line + "\n")
 
         output_file = Path(f"/tmp/{job.job_id}_cracked.txt")
-        result = self.hashcat.run_tokenlist_attack(hash_file, tokenlist_path, output_file, timeout_hours=8)
+        result = self.hashcat.run_tokenlist_attack(job.wallet_path, tokenlist_path, output_file, timeout_hours=8)
 
-        if result["success"]:
+        if result.get("success"):
             vault_pw = self._get_vault_password()
             entry_id = self.vault.encrypt(result["password"], vault_pw,
                 metadata={"job_id": job.job_id, "vector": job.vector.value})
@@ -347,8 +353,8 @@ class SecGuyOrchestrator:
         print("[ORCHESTRATOR] Tokenlist failed. Trying mask attack...")
         masks = self.behavioral_profiler.generate_mask_patterns(creation_year)
         for mask in masks:
-            mask_result = self.hashcat.run_mask_attack(hash_file, mask, output_file, timeout_hours=2)
-            if mask_result["success"]:
+            mask_result = self.hashcat.run_mask_attack(job.wallet_path, mask, output_file, timeout_hours=2)
+            if mask_result.get("success"):
                 vault_pw = self._get_vault_password()
                 entry_id = self.vault.encrypt(mask_result["password"], vault_pw,
                     metadata={"job_id": job.job_id, "vector": job.vector.value})
@@ -483,9 +489,9 @@ class SecGuyOrchestrator:
                         f.write(pwd + "\n")
 
                 output_file = Path(f"/tmp/{job.job_id}_cracked.txt")
-                result = self.hashcat.run_tokenlist_attack(hash_file, tokenlist_path, output_file, timeout_hours=1)
+                result = self.hashcat.run_tokenlist_attack(job.wallet_path, tokenlist_path, output_file, timeout_hours=1)
 
-                if result["success"]:
+                if result.get("success"):
                     vault_pw = self._get_vault_password()
                     entry_id = self.vault.encrypt(result["password"], vault_pw,
                         metadata={"job_id": job.job_id, "vector": job.vector.value})

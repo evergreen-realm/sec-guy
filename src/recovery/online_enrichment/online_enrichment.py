@@ -27,7 +27,7 @@ class OnlineEnrichmentAgent:
         self.data_dir = data_dir
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.hibp = HIBPClient(self.data_dir)
-        self.dehashed = DeHashedClient(cache_dir=self.data_dir)
+        self.dehashed = DeHashedClient()
         self.seclists = SecListsDownloader(self.data_dir / "seclists")
         self.cloud = CloudAIClient()
         self.cupp = CUPPWrapper()
