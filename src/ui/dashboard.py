@@ -1,6 +1,6 @@
 """
 Web dashboard for SEC-GUY metrics.
-Provides a modern HTML UI at http://localhost:8081 and JSON API at /api/metrics.
+Provides a modern full-screen HTML UI at http://localhost:8081 and JSON API at /api/metrics.
 """
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -16,10 +16,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <title>SEC-GUY v3.1 — Recovery Metrics Dashboard</title>
     <style>
         :root {
-            --bg-color: #0d1117;
-            --card-bg: #161b22;
-            --border-color: #30363d;
-            --text-main: #c9d1d9;
+            --bg-color: #0b0e14;
+            --card-bg: #151a23;
+            --border-color: #262c36;
+            --text-main: #9da7b3;
             --text-heading: #ffffff;
             --accent-cyan: #58a6ff;
             --accent-green: #3fb950;
@@ -27,19 +27,24 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             --accent-yellow: #d29922;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
-            padding: 40px 20px;
+            padding: 30px 40px;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
         }
 
         .container {
-            max-width: 1000px;
-            width: 100%;
+            max-width: 1600px;
+            width: 95%;
         }
 
         header {
@@ -47,121 +52,124 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
+            padding-bottom: 24px;
+            margin-bottom: 36px;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
         }
 
         .logo {
-            font-size: 28px;
+            font-size: 36px;
         }
 
         h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 32px;
             color: var(--text-heading);
             font-weight: 700;
             letter-spacing: -0.5px;
         }
 
         .subtitle {
-            font-size: 13px;
+            font-size: 15px;
             color: #8b949e;
-            margin-top: 4px;
+            margin-top: 6px;
         }
 
         .status-badge {
             background-color: rgba(63, 185, 80, 0.15);
             color: var(--accent-green);
             border: 1px solid rgba(63, 185, 80, 0.4);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
+            padding: 8px 20px;
+            border-radius: 24px;
+            font-size: 14px;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .dot {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             background-color: var(--accent-green);
             border-radius: 50%;
             display: inline-block;
-            box-shadow: 0 0 8px var(--accent-green);
+            box-shadow: 0 0 10px var(--accent-green);
         }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 28px;
+            margin-bottom: 40px;
         }
 
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
             transition: transform 0.2s, border-color 0.2s;
         }
 
         .card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
             border-color: var(--accent-cyan);
         }
 
         .card-title {
-            font-size: 13px;
+            font-size: 14px;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
+            letter-spacing: 1px;
             color: #8b949e;
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
         .card-value {
-            font-size: 36px;
+            font-size: 52px;
             font-weight: 700;
             color: var(--text-heading);
             font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            line-height: 1.1;
         }
 
         .card-desc {
-            font-size: 12px;
+            font-size: 14px;
             color: #8b949e;
-            margin-top: 8px;
+            margin-top: 12px;
         }
 
         .json-box {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 16px;
+            padding: 28px;
         }
 
         .json-box h3 {
             margin-top: 0;
-            font-size: 15px;
+            font-size: 18px;
             color: var(--text-heading);
+            margin-bottom: 16px;
         }
 
         pre {
-            background-color: #090d13;
-            padding: 16px;
-            border-radius: 8px;
+            background-color: #070a0f;
+            padding: 24px;
+            border-radius: 12px;
             overflow-x: auto;
             color: var(--accent-cyan);
-            font-size: 13px;
+            font-size: 15px;
+            line-height: 1.5;
             margin: 0;
-            border: 1px solid #21262d;
+            border: 1px solid #1c212a;
         }
     </style>
 </head>
@@ -189,7 +197,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             <div class="card">
                 <div class="card-title">Active Operations</div>
                 <div class="card-value" style="color: var(--accent-cyan);" id="active_jobs">0</div>
-                <div class="card-desc">Running in memory/Redis</div>
+                <div class="card-desc">Running in memory / Redis</div>
             </div>
             <div class="card">
                 <div class="card-title">Candidates Generated</div>
@@ -208,13 +216,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             </div>
             <div class="card">
                 <div class="card-title">System Uptime</div>
-                <div class="card-value" style="font-size: 28px;" id="uptime_seconds">0s</div>
+                <div class="card-value" style="font-size: 38px; color: var(--accent-cyan);" id="uptime_seconds">0s</div>
                 <div class="card-desc">Metrics collector runtime</div>
             </div>
         </div>
 
         <div class="json-box">
-            <h3>Raw Telemetry Payload (<a href="/api/metrics" target="_blank" style="color: var(--accent-cyan);">/api/metrics</a>)</h3>
+            <h3>Raw Telemetry Payload (<a href="/api/metrics" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">/api/metrics</a>)</h3>
             <pre id="json-raw">Loading telemetry...</pre>
         </div>
     </div>
@@ -300,7 +308,6 @@ class MetricsHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
     def log_message(self, format, *args):
-        # Silence default request logging to avoid terminal clutter
         pass
 
 
