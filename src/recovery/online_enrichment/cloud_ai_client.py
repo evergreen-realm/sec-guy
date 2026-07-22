@@ -22,17 +22,17 @@ class CloudAIClient:
         "cerebras": "https://api.cerebras.ai/v1/chat/completions",
         "sambanova": "https://api.sambanova.ai/v1/chat/completions",
         "openrouter": "https://openrouter.ai/api/v1/chat/completions",
-        "google": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent",
+        "google": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
         "mistral": "https://api.mistral.ai/v1/chat/completions",
         "deepseek": "https://api.deepseek.com/chat/completions",
     }
 
     MODELS = {
         "groq": "llama-3.3-70b-versatile",
-        "cerebras": "llama-3.1-70b",
-        "sambanova": "DeepSeek-R1",
+        "cerebras": "llama3.1-70b",
+        "sambanova": "Meta-Llama-3.1-70B-Instruct",
         "openrouter": "meta-llama/llama-3.3-70b-instruct",
-        "google": "gemini-2.5-flash-preview-05-20",
+        "google": "gemini-2.0-flash",
         "mistral": "mistral-large-latest",
         "deepseek": "deepseek-chat",
     }

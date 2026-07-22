@@ -132,7 +132,9 @@ class ModelManager:
 
         # Last resort: cloud APIs
         from ..recovery.online_enrichment.cloud_ai_client import CloudAIClient
-        cloud = CloudAIClient()
+        import os
+        keys = {k.lower().replace('_api_key', '').replace('_key', ''): os.getenv(k) for k in ['GROQ_API_KEY', 'CEREBRAS_API_KEY', 'SAMBANOVA_API_KEY', 'OPENROUTER_API_KEY', 'GOOGLE_AI_KEY'] if os.getenv(k)}
+        cloud = CloudAIClient(api_keys=keys)
         return cloud.chat_with_fallback(messages, temperature=temperature, max_tokens=max_tokens)
 
 
