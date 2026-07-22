@@ -82,7 +82,7 @@ def main():
         partial_seed = args.seed.split()
 
     # Initialize orchestrator
-    config = get_config()
+    get_config()
     orchestrator = SecGuyOrchestrator()
 
     # Detect or use specified vector

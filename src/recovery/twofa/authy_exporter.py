@@ -59,7 +59,7 @@ class AuthyExporter:
                             'secret': data['authenticator']['secret'],
                             'issuer': data.get('issuer', 'Authy')
                         })
-                except:
+                except Exception:
                     continue
             return secrets
         except Exception as e:

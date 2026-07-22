@@ -1,4 +1,4 @@
-# SEC-GUY v3.1 — Project Manifest
+b# SEC-GUY v3.1 — Project Manifest
 ## Complete File Inventory
 
 **Generated:** 2026-05-25

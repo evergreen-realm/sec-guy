@@ -18,7 +18,7 @@ class AddressVerifier:
         """
         try:
             mnemo = Mnemonic("english")
-            seed = mnemo.to_seed(seed_phrase, passphrase="")  # 512-bit seed
+            mnemo.to_seed(seed_phrase, passphrase="")  # 512-bit seed
             # Use BIP32 to derive child keys; for simplicity, use a library like `bip32utils`
             # Here we'll implement a minimal version using ecdsa and hashlib.
             # This is a placeholder; in production use `bip32` package.

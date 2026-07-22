@@ -35,7 +35,7 @@ class SeedRecoverWrapper:
             "--partial", " ".join(partial_words),
             "--missing", ",".join(str(p) for p in missing_positions),
         ]
-        start = time.time()
+        time.time()
         try:
             proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout_seconds, check=False)
         except subprocess.TimeoutExpired:

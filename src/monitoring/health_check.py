@@ -64,7 +64,7 @@ class HealthChecker:
                                           auth=("neo4j", "secguy_neo4j_2025"))
             with driver.session() as session:
                 result = session.run("RETURN 1 AS test")
-                record = result.single()
+                result.single()
             driver.close()
             return HealthStatus("neo4j", True, {"connected": True})
         except Exception as e:
@@ -74,7 +74,7 @@ class HealthChecker:
         try:
             result = subprocess.run(["nvidia-smi"], capture_output=True, text=True, timeout=5)
             if result.returncode == 0:
-                lines = result.stdout.split("\n")
+                result.stdout.split("\n")
                 return HealthStatus("gpu", True, {"nvidia_smi": "available"})
             return HealthStatus("gpu", False, {}, "nvidia-smi failed")
         except Exception as e:

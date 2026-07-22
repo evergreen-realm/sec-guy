@@ -32,6 +32,9 @@ SEC-GUY unifies multiple specialized recovery engines into an extensible orchest
 ```bash
 git clone https://github.com/your-username/sec-guy.git
 cd sec-guy
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
 pip install -e .
 secguy --help
 ```
@@ -45,15 +48,23 @@ secguy --help
 Run health checks or evaluate recovery vectors:
 
 ```bash
-python -m src.main --health
+secguy --analyze --target ./backup.dat
 ```
 
 ### Terminal User Interface (TUI)
 
-Launch the interactive terminal dashboard:
+Launch the interactive dashboard to manage recovery jobs and monitor candidate estimation in real-time:
 
 ```bash
-python -m src.ui.tui
+secguy ui --dashboard
+```
+
+### Partial Seed Recovery
+
+Recover specific data blocks using a known partial seed or entropy pattern:
+
+```bash
+secguy recover --seed "partial_data_string" --input ./encrypted.vault
 ```
 
 ---

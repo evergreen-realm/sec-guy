@@ -177,7 +177,7 @@ class TimeLockVault:
 
     def shred(self, entry_id: str) -> bool:
         """Securely delete a vault entry."""
-        entry = self.entries.pop(entry_id, None)
+        self.entries.pop(entry_id, None)
         vault_file = self.mount_point / f"{entry_id}.vault"
         if vault_file.exists():
             size = vault_file.stat().st_size

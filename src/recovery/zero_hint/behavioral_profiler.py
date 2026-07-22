@@ -8,7 +8,8 @@ No stubs. No TODOs. Real implementation.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Generator, List
+from typing import Dict, Generator, List, Optional
+from src.recovery.online_enrichment.cupp_wrapper import CUPPWrapper
 
 
 class BehavioralProfiler:
@@ -62,15 +63,25 @@ class BehavioralProfiler:
     def __init__(self, wordlist_dir: Path = Path("/opt/sec-guy/wordlists")):
         self.wordlist_dir = wordlist_dir
         self.wordlist_dir.mkdir(parents=True, exist_ok=True)
+        self.cupp = CUPPWrapper()
 
     def generate_candidates(self, wallet_metadata: Dict,
-                            max_candidates: int = 100000) -> Generator[str, None, None]:
+                            max_candidates: int = 100000,
+                            profile: Optional[Dict] = None) -> Generator[str, None, None]:
         """Generate password candidates from behavioral patterns."""
         creation_year = wallet_metadata.get("creation_year", datetime.now().year)
-        era = wallet_metadata.get("version_era", "modern")
+        wallet_metadata.get("version_era", "modern")
 
         candidates = set()
         count = 0
+
+        if profile and any(k in profile for k in ["name", "firstname", "surname", "birthdate", "pet", "partner"]):
+            try:
+                cupp_passwords = self.cupp.generate_profiling_wordlist(profile)
+                for p in cupp_passwords:
+                    candidates.add(p)
+            except Exception:
+                pass
 
         # Phase 1: Most common passwords (highest probability)
         for pwd in self.COMMON_PATTERNS:

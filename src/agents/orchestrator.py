@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 import logging
 
+from src.core.redis_client import RedisClient
 from src.core.config import get_config
 from src.recovery.corruption.json_repair import repair_json_file
 from src.recovery.twofa.backup_code_parser import BackupCodeParser
@@ -60,7 +61,9 @@ class SecGuyOrchestrator:
         self.jobs: Dict[str, RecoveryJob] = {}
         self.current_mode = LLMMode.ORCHESTRATOR
         self.vault_password: Optional[str] = None
+        self.redis = RedisClient()
         self._init_components()
+        self.restore_jobs()
 
     def _init_components(self):
         from src.recovery.corruption.exodus_parser import ExodusVersionDetector
@@ -141,9 +144,12 @@ class SecGuyOrchestrator:
 
         if job.vector == RecoveryVector.PASSWORD_HINTED:
             hint_length = len(job.hints)
-            if hint_length > 50: confidence += 25
-            elif hint_length > 20: confidence += 15
-            elif hint_length > 5: confidence += 5
+            if hint_length > 50:
+                confidence += 25
+            elif hint_length > 20:
+                confidence += 15
+            elif hint_length > 5:
+                confidence += 5
 
         try:
             import subprocess
@@ -160,9 +166,12 @@ class SecGuyOrchestrator:
 
         if job.vector == RecoveryVector.SEED_PARTIAL:
             known = len([w for w in job.partial_seed if w != "?"])
-            if known >= 11: confidence += 40
-            elif known >= 8: confidence += 25
-            elif known >= 5: confidence += 10
+            if known >= 11:
+                confidence += 40
+            elif known >= 8:
+                confidence += 25
+            elif known >= 5:
+                confidence += 10
 
         if "file_ctime" in job.metadata:
             confidence += 5
@@ -499,6 +508,29 @@ class SecGuyOrchestrator:
 
         return {"success": False, "error": "Legacy recovery failed"}
 
+    def restore_jobs(self) -> None:
+        try:
+            job_ids = self.redis.list_job_ids()
+            for jid in job_ids:
+                data = self.redis.get_job(jid)
+                if data:
+                    j = RecoveryJob(
+                        job_id=data.get("job_id", jid),
+                        wallet_path=Path(data.get("wallet_path", "")),
+                        vector=RecoveryVector(data.get("vector", "unknown")),
+                        hints=data.get("hints", ""),
+                        partial_seed=data.get("partial_seed", []),
+                        metadata=data.get("metadata", {}),
+                        status=data.get("status", "pending"),
+                        result=data.get("result"),
+                        confidence=data.get("confidence", 0.0)
+                    )
+                    self.jobs[j.job_id] = j
+            if job_ids:
+                logger.info(f"Restored {len(job_ids)} jobs from Redis")
+        except Exception as e:
+            logger.warning(f"Failed to restore jobs from Redis: {e}")
+
     def submit_job(self, wallet_path: Path, hints: str = "",
                    partial_seed: List[str] = None,
                    metadata: Optional[Dict] = None) -> RecoveryJob:
@@ -540,7 +572,8 @@ class SecGuyOrchestrator:
     def _checkpoint_job_state(self, job_id: str, status: str, payload: Dict[str, Any]) -> None:
         """Persist state checkpoint to Redis if available."""
         try:
-            import redis, json
+            import redis
+            import json
             r = redis.Redis(host='localhost', port=6379, db=0, socket_connect_timeout=2)
             data = {"status": status, "payload": payload}
             r.set(f"job:{job_id}:checkpoint", json.dumps(data))

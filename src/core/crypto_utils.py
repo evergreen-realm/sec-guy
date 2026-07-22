@@ -31,7 +31,7 @@ class SecureVault:
 
     def _derive_key(self, password: str, salt: bytes) -> bytes:
         """Derive AES key via Argon2id."""
-        hasher = argon2.PasswordHasher(
+        argon2.PasswordHasher(
             time_cost=self.ARGON2_TIME_COST,
             memory_cost=self.ARGON2_MEMORY_COST,
             parallelism=self.ARGON2_PARALLELISM,
