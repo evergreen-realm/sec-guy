@@ -78,15 +78,15 @@ class AuthyExporter:
                 "entries": [
                     {
                         "type": "totp",
-                        "name": s["name"],
+                        "name": s.get("name", "Unknown Account"),
                         "issuer": "Authy",
                         "note": "Imported from Authy",
                         "favorite": False,
                         "info": {
-                            "secret": "UNKNOWN",  # Would need decryption
+                            "secret": s.get("secret", ""),
                             "algo": "SHA1",
-                            "digits": s["digits"],
-                            "period": s["period"],
+                            "digits": s.get("digits", 6),
+                            "period": s.get("period", 30),
                         },
                     }
                     for s in secrets

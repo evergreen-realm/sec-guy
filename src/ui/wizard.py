@@ -28,9 +28,18 @@ class SetupWizard:
         self._configure_enrichment()
         self._configure_monitoring()
 
+        self._save_config()
+
         print()
-        print("Setup complete! Configuration saved.")
+        print("Setup complete! Configuration saved to config/secguy.yaml.")
         return self.config
+
+    def _save_config(self, path: Path = Path("config/secguy.yaml")) -> None:
+        """Write current configuration dictionary to secguy.yaml."""
+        import yaml
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "w") as f:
+            yaml.dump(self.config, f, default_flow_style=False)
 
     def _configure_hardware(self) -> None:
         print("--- Hardware Configuration ---")

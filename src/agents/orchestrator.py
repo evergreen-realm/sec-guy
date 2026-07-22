@@ -207,7 +207,13 @@ class SecGuyOrchestrator:
         if not handler:
             return {"success": False, "error": f"No handler for vector: {job.vector.value}"}
 
+        # Checkpoint job start state to Redis
+        self._checkpoint_job_state(job.job_id, "RUNNING", {"vector": job.vector.value})
+
         result = handler(job)
+
+        # Checkpoint job completion state to Redis
+        self._checkpoint_job_state(job.job_id, "COMPLETED" if result.get("success") else "FAILED", result)
 
         # Log result
         self.audit_logger.log_recovery_result(
@@ -525,6 +531,16 @@ class SecGuyOrchestrator:
         print(f"[ORCHESTRATOR] Confidence: {job.confidence:.1f}%")
 
         return job
+
+    def _checkpoint_job_state(self, job_id: str, status: str, payload: Dict[str, Any]) -> None:
+        """Persist state checkpoint to Redis if available."""
+        try:
+            import redis, json
+            r = redis.Redis(host='localhost', port=6379, db=0, socket_connect_timeout=2)
+            data = {"status": status, "payload": payload}
+            r.set(f"job:{job_id}:checkpoint", json.dumps(data))
+        except Exception as e:
+            logger.debug("Redis unavailable for job checkpointing: %s", e)
 
 
 if __name__ == "__main__":

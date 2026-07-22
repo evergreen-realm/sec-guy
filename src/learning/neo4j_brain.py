@@ -39,8 +39,14 @@ class Neo4jBrain:
     Edges: SIMILAR_TO, DERIVED_FROM, SUPERCEDED_BY, CORRELATES_WITH, IMPROVED_BY
     """
 
-    def __init__(self, uri: str = "bolt://localhost:7687",
-                 auth: Tuple[str, str] = ("neo4j", "secguy_neo4j_2025")):
+    def __init__(self, uri: Optional[str] = None,
+                 auth: Optional[Tuple[str, str]] = None):
+        import os
+        uri = uri or os.getenv("NEO4J_URI", "bolt://localhost:7687")
+        if auth is None:
+            user = os.getenv("NEO4J_USER", "neo4j")
+            pwd = os.getenv("NEO4J_PASSWORD") or os.getenv("NEO4J_AUTH", "secguy_neo4j_2025")
+            auth = (user, pwd)
         self.driver = GraphDatabase.driver(uri, auth=auth)
         self._init_schema()
 

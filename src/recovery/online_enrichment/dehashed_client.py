@@ -46,9 +46,18 @@ class DeHashedClient:
             return {"error": str(e)}
 
     def get_password_patterns(self, domain: Optional[str] = None) -> List[str]:
-        """Extract password patterns from DeHashed results."""
-        # Simplified: would query and extract patterns
-        return []
+        """Extract password patterns from DeHashed search results."""
+        query = f"domain:{domain}" if domain else "exodus"
+        res = self.search(query)
+        entries = res.get("entries", [])
+        patterns = []
+        if isinstance(entries, list):
+            for entry in entries:
+                if isinstance(entry, dict) and "password" in entry:
+                    pwd = entry["password"]
+                    if pwd and pwd not in patterns:
+                        patterns.append(pwd)
+        return patterns
 
     def download_sample_data(self) -> Path:
         """Download sample breach data for offline analysis."""
